@@ -77,7 +77,7 @@ jobs:
       deb: ${{ steps.version.outputs.deb }}
 
   build:
-    if: ${{ inputs.target != '' && inputs.arch != 'native' }}
+    if: ${{ inputs.target != '' }}
     needs: [version]
     uses: ./.github/workflows/build_firmware.yml
     with:
