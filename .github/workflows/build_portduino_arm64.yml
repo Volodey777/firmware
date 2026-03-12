@@ -1,0 +1,46 @@
+name: Build Meshtastic Portduino ARM64 (Raspberry Pi)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  build-arm64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build ARM64 Portduino
+        uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: aarch64
+          distro: ubuntu22.04
+
+          install: |
+            apt update
+            apt install -y \
+              git \
+              python3 \
+              python3-pip \
+              build-essential \
+              cmake \
+              libgpiod-dev \
+              libi2c-dev \
+              libbluetooth-dev
+
+            pip3 install platformio
+
+          run: |
+            echo "Building Meshtastic Portduino for ARM64"
+            pio run -e native
+
+      - name: Upload Portduino binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: meshtastic-portduino-arm64
+          path: .pio/build/native/program
