@@ -1,0 +1,44 @@
+name: Build Portduino (Raspberry Pi)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  build-native:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            build-essential \
+            git \
+            cmake \
+            libgpiod-dev \
+            libi2c-dev \
+            libbluetooth-dev
+
+      - name: Build Portduino
+        run: pio run -e native
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: meshtastic-portduino
+          path: .pio/build/native/program
